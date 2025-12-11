@@ -11,7 +11,7 @@
 
 ## 1. Game Overview & Core Concept
 
-### 1.1 Executive Summary
+### 1.1 Executive Summary 
 "Pixel Art RPG Portfolio" transforms professional experience into an immersive gaming journey where players navigate "The System" - a digital realm representing the professional ecosystem. Each career phase becomes a distinct zone, with specific tools and achievements converted into tangible game mechanics.
 
 ### 1.2 Core Innovation
