@@ -1,0 +1,21 @@
+{
+  "player": {
+    "position": [
+      100,
+      100
+    ],
+    "zone": 1,
+    "level": 1,
+    "experience": 0,
+    "inventory": []
+  },
+  "game": {
+    "current_zone": 1,
+    "completed_zones": [],
+    "settings": {
+      "master_volume": 0.7,
+      "sfx_volume": 0.8,
+      "music_volume": 0.6
+    }
+  }
+}

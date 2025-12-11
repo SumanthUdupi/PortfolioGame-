@@ -1,0 +1,59 @@
+{
+  "contact_info": {
+    "name": "Sumanth Udupi",
+    "title": "Business Analyst | ESG, EHS, ERP & QMS | Agile, API, and Data-Driven Product Development",
+    "location": "Bangalore, India",
+    "phone": "+91 9741712966",
+    "email": "sumanthudupi858@gmail.com",
+    "linkedin": "linkedin.com/in/sumanth-udupi",
+    "github": "github.com/SumanthUdupi"
+  },
+  "professional_summary": "A strategic Business Analyst with a unique foundation in Systems Engineering and Data Science, skilled in bridging the gap between business requirements and technical solutions for clients like Volvo and PACCAR. A trusted partner through the entire software lifecycle with a proven ability to manage product roadmaps, write user stories in Gherkin syntax, and lead Agile ceremonies. Adept at collaborating with UX teams on Figma-based prototypes and using Postman and Swagger to validate and document REST API endpoints.",
+  "skills": {
+    "tools": ["Azure DevOps", "Jira", "MS Project", "Smartsheet"],
+    "data_analysis": ["SQL", "Excel", "Power BI", "Tableau", "ETL", "Superset", "Predictive Analytics"],
+    "business_analysis": ["Gherkin", "SDLC", "Agile", "User Stories", "Business Process Model and Notation (BPMN)"],
+    "api_and_architecture": ["Postman", "Swagger/OpenAPI", "REST API Integration"],
+    "design_and_testing": ["Figma", "Proto.io", "UAT Planning & Execution", "Zephyr", "TestRail"],
+    "domains": ["ESG", "EHS", "ERP", "Automotive QMS", "Ad Tech"]
+  },
+  "professional_experience": [
+    {
+      "role": "Integration Lead & Business Analyst",
+      "company": "RGBSI",
+      "location": "Bangalore, India",
+      "dates": "07/2023 - Present",
+      "key_achievements": [
+        "Authored 200+ Gherkin-based user stories",
+        "Led Agile ceremonies for 7-member cross-functional squad",
+        "Partnered with UX teams on Figma prototypes",
+        "Validated REST APIs using Postman and Swagger",
+        "Built Superset dashboards tracking ESG/EHS adoption",
+        "Led end-to-end business analysis for scalable EHS platform"
+      ]
+    },
+    {
+      "role": "Advertisement Moderator & Analyst",
+      "company": "Amazon",
+      "dates": "07/2022 - 07/2023"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Post Graduate Diploma, Data Science",
+      "institution": "Steinbeis University, Germany",
+      "year": "2022"
+    },
+    {
+      "degree": "B.E, Mechanical Engineering",
+      "institution": "Dayananda Sagar College",
+      "year": "2017-2021"
+    }
+  ],
+  "certifications": [
+    "UX Design Professional Certificate (Google, 2025)",
+    "Business Analysis (Microsoft and LinkedIn, 2025)",
+    "Agile Project Management (Atlassian, 2025)",
+    "Machine Learning with Python (IBM, 2024)"
+  ]
+}
