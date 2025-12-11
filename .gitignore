@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+build/
+dist/
+*.spec
+.pytest_cache/
+save_data.json
+assets/sprites/
+assets/sounds/
