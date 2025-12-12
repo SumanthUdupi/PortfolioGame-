@@ -1,18 +1,25 @@
+import pygame
+
 class BaseScene:
-    def __init__(self, game_manager):
-        self.game_manager = game_manager
+    def __init__(self, game):
+        self.game = game
 
-    def on_enter(self):
+    def enter(self):
+        # Called when the scene becomes active
         pass
 
-    def on_exit(self):
+    def exit(self):
+        # Called when the scene becomes inactive
         pass
 
-    def handle_event(self, event):
+    def handle_events(self, events):
+        # Handle input events specific to this scene
         pass
 
     def update(self, dt):
+        # Update game logic specific to this scene
         pass
 
-    def render(self, screen):
+    def draw(self, screen):
+        # Draw elements specific to this scene
         pass

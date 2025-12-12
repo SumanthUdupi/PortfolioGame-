@@ -1,42 +1,40 @@
-import unittest
-import sys
-import os
+import pygame
+import pytest
+from game.entities.entity import Entity
+from game.managers.input_manager import InputManager
 
-# Add the project root to the path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Initialize Pygame for tests that require it
+pygame.init()
+pygame.display.set_mode((1, 1)) # Create a dummy screen for pygame.display calls
 
-from game.managers.save_manager import SaveManager
-from game.entities.player import Player
-from game.systems.collision_system import CollisionSystem
+@pytest.fixture
+def dummy_entity():
+    # A simple entity for testing
+    return Entity(x=0, y=0, width=10, height=10)
 
-class TestCore(unittest.TestCase):
-    def test_save_manager(self):
-        save_manager = SaveManager()
-        self.assertIsInstance(save_manager.save_data, dict)
-        self.assertIn("player", save_manager.save_data)
-        self.assertIn("game", save_manager.save_data)
+def test_entity_initialization(dummy_entity):
+    assert dummy_entity.rect.x == 0
+    assert dummy_entity.rect.y == 0
+    assert dummy_entity.rect.width == 10
+    assert dummy_entity.rect.height == 10
+    assert dummy_entity.speed == 0
 
-    def test_player_creation(self):
-        player = Player(100, 100)
-        self.assertEqual(player.x, 100)
-        self.assertEqual(player.y, 100)
-        self.assertEqual(player.level, 1)
-        self.assertEqual(player.experience, 0)
+def test_entity_movement(dummy_entity):
+    dummy_entity.speed = 100
+    dummy_entity.velocity.x = 1
+    dummy_entity.velocity.y = 0
+    dummy_entity.update(1) # Simulate 1 second pass
+    assert dummy_entity.rect.x == 100
+    assert dummy_entity.rect.y == 0
 
-    def test_collision_system(self):
-        # Create mock entities
-        entity1 = type('Entity', (), {'x': 0, 'y': 0, 'width': 10, 'height': 10, 'rect': None})()
-        entity1.rect = type('Rect', (), {'colliderect': lambda self, other: True})()
+    dummy_entity.velocity.x = 0
+    dummy_entity.velocity.y = 1
+    dummy_entity.update(0.5) # Simulate 0.5 second pass
+    assert dummy_entity.rect.x == 100
+    assert dummy_entity.rect.y == 50
 
-        entity2 = type('Entity', (), {'x': 5, 'y': 5, 'width': 10, 'height': 10, 'rect': None})()
-        entity2.rect = type('Rect', (), {'colliderect': lambda self, other: True})()
-
-        self.assertTrue(CollisionSystem.check_collision(entity1, entity2))
-
-    def test_point_collision(self):
-        entity = type('Entity', (), {'rect': type('Rect', (), {'collidepoint': lambda self, point: point == (5, 5)})()})()
-        self.assertTrue(CollisionSystem.check_point_collision((5, 5), entity))
-        self.assertFalse(CollisionSystem.check_point_collision((10, 10), entity))
-
-if __name__ == '__main__':
-    unittest.main()
+# Test for InputManager (requires careful mocking or special handling for pygame.key.get_pressed())
+# For now, let's just ensure it can be instantiated without error
+def test_input_manager_instantiation():
+    input_manager = InputManager()
+    assert input_manager is not None

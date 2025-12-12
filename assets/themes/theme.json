@@ -1,0 +1,50 @@
+{
+    "defaults":
+    {
+        "colours":
+        {
+            "normal_bg": "#2D2D2D",
+            "hovered_bg": "#3D3D3D",
+            "disabled_bg": "#252525",
+            "selected_bg": "#0A5299",
+            "dark_bg": "#1A1A1A",
+            "normal_text": "#E6F3FF",
+            "hovered_text": "#FFFFFF",
+            "selected_text": "#FFFFFF",
+            "disabled_text": "#6C757D",
+            "link_text": "#118DFF",
+            "link_hover": "#E6F3FF",
+            "link_selected": "#E6F3FF",
+            "text_shadow": "#000000",
+            "normal_border": "#0A5299",
+            "hovered_border": "#118DFF",
+            "disabled_border": "#343A40",
+            "selected_border": "#E6F3FF"
+        }
+    },
+    "@main_title":
+    {
+        "font":
+        {
+            "name": "Roboto",
+            "size": "48"
+        },
+        "colours":
+        {
+            "normal_text": "#E6F3FF"
+        }
+    },
+    "button":
+    {
+        "font":
+        {
+            "name": "Roboto",
+            "size": "20"
+        },
+        "misc":
+        {
+            "border_width": "2",
+            "shadow_width": "2"
+        }
+    }
+}

@@ -1,55 +1,43 @@
 import pygame
-from config import *
 
 class InputManager:
-    def __init__(self):
-        self.keys_pressed = {}
-        self.keys_held = {}
-        self.mouse_pos = (0, 0)
-        self.mouse_buttons = {}
-        self.gamepad = None
+    _instance = None
 
-        # Initialize gamepad if available
-        if pygame.joystick.get_count() > 0:
-            self.gamepad = pygame.joystick.Joystick(0)
-            self.gamepad.init()
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(InputManager, cls).__new__(cls)
+            cls._instance.keyboard_state = {}
+            cls._instance.prev_keyboard_state = {}
+            cls._instance.mouse_pos = (0, 0)
+            cls._instance.mouse_buttons = (0, 0, 0) # left, middle, right
+            cls._instance.prev_mouse_buttons = (0, 0, 0)
+        return cls._instance
 
-    def handle_event(self, event):
-        if event.type == pygame.KEYDOWN:
-            self.keys_pressed[event.key] = True
-            self.keys_held[event.key] = True
-        elif event.type == pygame.KEYUP:
-            self.keys_held[event.key] = False
-        elif event.type == pygame.MOUSEMOTION:
-            self.mouse_pos = event.pos
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            self.mouse_buttons[event.button] = True
-        elif event.type == pygame.MOUSEBUTTONUP:
-            self.mouse_buttons[event.button] = False
+    def update(self):
+        self.prev_keyboard_state = self.keyboard_state
+        self.keyboard_state = pygame.key.get_pressed()
 
-    def update(self, dt):
-        # Clear pressed keys each frame
-        self.keys_pressed.clear()
-        self.mouse_buttons.clear()
+        self.prev_mouse_buttons = self.mouse_buttons
+        self.mouse_buttons = pygame.mouse.get_pressed()
+        self.mouse_pos = pygame.mouse.get_pos()
 
     def is_key_pressed(self, key):
-        return key in self.keys_pressed
+        return self.keyboard_state[key] and not self.prev_keyboard_state[key]
 
     def is_key_held(self, key):
-        return self.keys_held.get(key, False)
+        return self.keyboard_state[key]
+
+    def is_key_released(self, key):
+        return not self.keyboard_state[key] and self.prev_keyboard_state[key]
 
     def get_mouse_pos(self):
         return self.mouse_pos
 
     def is_mouse_button_pressed(self, button):
-        return button in self.mouse_buttons
+        return self.mouse_buttons[button] and not self.prev_mouse_buttons[button]
 
-    def get_gamepad_axis(self, axis):
-        if self.gamepad:
-            return self.gamepad.get_axis(axis)
-        return 0.0
+    def is_mouse_button_held(self, button):
+        return self.mouse_buttons[button]
 
-    def is_gamepad_button_pressed(self, button):
-        if self.gamepad:
-            return self.gamepad.get_button(button)
-        return False
+    def is_mouse_button_released(self, button):
+        return not self.mouse_buttons[button] and self.prev_mouse_buttons[button]

@@ -1,59 +1,37 @@
 import pygame
-from config import *
 from game.entities.entity import Entity
+from game.managers.input_manager import InputManager
+from config import BLACK, WHITE
 
 class Player(Entity):
-    def __init__(self, x, y):
-        super().__init__(x, y, PLAYER_SIZE, PLAYER_SIZE)
-        self.speed = PLAYER_SPEED
-        self.zone = 1
-        self.level = 1
-        self.experience = 0
+    def __init__(self, x, y, width, height, image=None):
+        super().__init__(x, y, width, height, image)
+        self.speed = 200 # pixels per second
+        self.input_manager = InputManager() # Singleton instance
 
-    def update(self, dt, input_manager, entities=None):
-        # Handle movement
-        dx = 0
-        dy = 0
+        # Placeholder image if none provided
+        if not image:
+            self.image = pygame.Surface([width, height])
+            self.image.fill(WHITE) # Player is white by default
 
-        if input_manager.is_key_held(KEYS["LEFT"]):
-            dx -= self.speed
-        if input_manager.is_key_held(KEYS["RIGHT"]):
-            dx += self.speed
-        if input_manager.is_key_held(KEYS["UP"]):
-            dy -= self.speed
-        if input_manager.is_key_held(KEYS["DOWN"]):
-            dy += self.speed
+    def update(self, dt):
+        self.velocity.x = 0
+        self.velocity.y = 0
+
+        if self.input_manager.is_key_held(pygame.K_LEFT) or self.input_manager.is_key_held(pygame.K_a):
+            self.velocity.x = -1
+        if self.input_manager.is_key_held(pygame.K_RIGHT) or self.input_manager.is_key_held(pygame.K_d):
+            self.velocity.x = 1
+        if self.input_manager.is_key_held(pygame.K_UP) or self.input_manager.is_key_held(pygame.K_w):
+            self.velocity.y = -1
+        if self.input_manager.is_key_held(pygame.K_DOWN) or self.input_manager.is_key_held(pygame.K_s):
+            self.velocity.y = 1
 
         # Normalize diagonal movement
-        if dx != 0 and dy != 0:
-            dx *= 0.707  # 1/sqrt(2)
-            dy *= 0.707
+        if self.velocity.length() > 0:
+            self.velocity.normalize_ip()
 
-        # Calculate new position
-        new_x = self.x + dx * dt * 60
-        new_y = self.y + dy * dt * 60
+        super().update(dt) # Call parent's update for position change
 
-        # Check collisions
-        can_move = True
-        if entities:
-            from game.systems.collision_system import CollisionSystem
-            temp_rect = pygame.Rect(new_x, new_y, self.width, self.height)
-            for entity in entities:
-                if entity != self and temp_rect.colliderect(entity.rect):
-                    can_move = False
-                    break
-
-        if can_move:
-            self.x = new_x
-            self.y = new_y
-
-        # Keep player in world bounds (assuming world is larger than screen)
-        # For now, no bounds, but camera will clamp
-
-        super().update(dt)
-
-    def render(self, screen, camera_x=0, camera_y=0):
-        # Draw player as a colored rectangle
-        pygame.draw.rect(screen, GREEN, (self.x - camera_x, self.y - camera_y, self.width, self.height))
-
-        super().render(screen, camera_x, camera_y)
+    def draw(self, screen):
+        super().draw(screen)
