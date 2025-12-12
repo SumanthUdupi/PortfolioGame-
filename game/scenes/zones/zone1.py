@@ -3,6 +3,14 @@ from config import *
 from game.scenes.zones.base_zone import BaseZone
 from game.entities.player import Player
 from game.entities.entity import Entity
+from game.ui.gherkin_minigame import GherkinMinigame
+
+# Scenario data definition
+SCENARIOS = {
+    "User login": ["Given I am on the login page", "When I enter valid credentials", "Then I should be redirected to the dashboard"],
+    "Data export": ["Given I have selected a date range", "When I click the export button", "Then a CSV file should download"],
+    "Report generation": ["Given the database has new records", "When the nightly job runs", "Then a daily report is generated"]
+}
 
 class Zone1(BaseZone):
     def __init__(self, game_manager):
@@ -11,6 +19,7 @@ class Zone1(BaseZone):
         self.api_terminals = []
         self.completed_gherkin = 0
         self.completed_apis = 0
+        self.current_minigame = None
 
     def load_zone_data(self):
         # Create player
@@ -58,6 +67,10 @@ class Zone1(BaseZone):
             self.add_entity(entity)
 
     def handle_event(self, event):
+        if self.current_minigame:
+            self.current_minigame.handle_events(event)
+            return
+
         if event.type == pygame.KEYDOWN and event.key == KEYS["INTERACT"]:
             self.check_interactions()
 
@@ -78,13 +91,24 @@ class Zone1(BaseZone):
                 break
 
     def start_gherkin_puzzle(self, station):
-        # Simple text-based puzzle (placeholder)
-        self.show_message(f"Gherkin puzzle completed: {station.scenario}")
-        station.completed = True
-        self.completed_gherkin += 1
-        self.player.experience += 50
-        self.game_manager.audio_manager.play_sound("gherkin_complete.wav")
-        self.check_completion()
+        scenario_data = SCENARIOS.get(station.scenario)
+        if not scenario_data:
+            print(f"Error: Missing data for scenario {station.scenario}")
+            return
+
+        def on_complete():
+            station.completed = True
+            self.completed_gherkin += 1
+            self.player.experience += 50
+            self.game_manager.audio_manager.play_sound("gherkin_complete.wav")
+            self.show_message(f"Gherkin puzzle completed: {station.scenario}")
+            self.current_minigame = None
+            self.check_completion()
+
+        def on_cancel():
+            self.current_minigame = None
+
+        self.current_minigame = GherkinMinigame(self.game_manager, station.scenario, scenario_data, on_complete, on_cancel)
 
     def start_api_validation(self, terminal):
         # Simple API validation (placeholder)
@@ -98,6 +122,12 @@ class Zone1(BaseZone):
     def get_zone_color(self):
         return (20, 20, 40)  # Dark blue for enterprise zone
 
+    def update(self, dt):
+        if self.current_minigame:
+            self.current_minigame.update(dt)
+            return
+        super().update(dt)
+
     def render_ui(self, screen):
         super().render_ui(screen)
 
@@ -106,6 +136,11 @@ class Zone1(BaseZone):
         # Zone progress
         progress_text = font.render(f"Gherkin: {self.completed_gherkin}/{len(self.gherkin_puzzles)}  APIs: {self.completed_apis}/{len(self.api_terminals)}", True, WHITE)
         screen.blit(progress_text, (10, SCREEN_HEIGHT - 40))
+
+    def draw(self, screen):
+        super().draw(screen)
+        if self.current_minigame:
+            self.current_minigame.draw(screen)
 
     def check_completion(self):
         if self.completed_gherkin == len(self.gherkin_puzzles) and self.completed_apis == len(self.api_terminals):

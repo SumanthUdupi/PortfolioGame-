@@ -1,3 +1,5 @@
+import pygame
+
 # Screen dimensions
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -23,3 +25,13 @@ GAME_STATE_MENU = 0
 GAME_STATE_PLAYING = 1
 GAME_STATE_PAUSED = 2
 GAME_STATE_GAME_OVER = 3
+
+# Key bindings
+KEYS = {
+    "UP": pygame.K_w,
+    "DOWN": pygame.K_s,
+    "LEFT": pygame.K_a,
+    "RIGHT": pygame.K_d,
+    "INTERACT": pygame.K_e,
+    "MENU": pygame.K_ESCAPE
+}
