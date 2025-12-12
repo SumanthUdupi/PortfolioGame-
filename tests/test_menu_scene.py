@@ -25,7 +25,7 @@ class TestMenuScene(unittest.TestCase):
         pygame.quit()
 
     def test_menu_options(self):
-        self.assertEqual(self.menu_scene.options, ["Start Career", "View Resume", "Exit"])
+        self.assertEqual(self.menu_scene.options, ["Start Career", "View Resume", "Credits / About Dev", "Exit"])
 
     def test_menu_navigation(self):
         # Initial selection
@@ -39,13 +39,17 @@ class TestMenuScene(unittest.TestCase):
         self.menu_scene.handle_events([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_DOWN)])
         self.assertEqual(self.menu_scene.selected_index, 2)
 
+        # Press Down again
+        self.menu_scene.handle_events([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_DOWN)])
+        self.assertEqual(self.menu_scene.selected_index, 3)
+
         # Wrap around
         self.menu_scene.handle_events([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_DOWN)])
         self.assertEqual(self.menu_scene.selected_index, 0)
 
         # Press Up
         self.menu_scene.handle_events([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP)])
-        self.assertEqual(self.menu_scene.selected_index, 2)
+        self.assertEqual(self.menu_scene.selected_index, 3)
 
     def test_select_start_career(self):
         self.menu_scene.selected_index = 0
@@ -58,6 +62,11 @@ class TestMenuScene(unittest.TestCase):
         self.assertEqual(self.game.scene_manager.current_scene, "resume_scene")
 
     def test_select_exit(self):
-        self.menu_scene.selected_index = 2
+        self.menu_scene.selected_index = 3
         self.menu_scene.handle_events([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN)])
         self.assertFalse(self.game.running)
+
+    def test_select_about(self):
+        self.menu_scene.selected_index = 2
+        self.menu_scene.handle_events([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN)])
+        self.assertEqual(self.game.scene_manager.current_scene, "about_scene")

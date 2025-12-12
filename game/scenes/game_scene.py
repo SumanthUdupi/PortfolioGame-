@@ -4,6 +4,7 @@ from config import BLACK, WHITE, WARM_BEIGE
 from game.managers.tilemap_manager import TileMapManager
 from game.entities.player import Player
 from game.ui.hud import HUD
+from game.ui.pause_menu import PauseMenu
 
 class GameScene(BaseScene):
     def __init__(self, game):
@@ -23,19 +24,65 @@ class GameScene(BaseScene):
         self.hud = HUD(game)
         # TODO: Link player to HUD explicitly if needed, or HUD can access via game.scene_manager
 
+        # Pause Menu
+        self.pause_menu = PauseMenu(game)
+
+        # Demo Mode
+        self.demo_mode = False
+        self.demo_timer = 0
+        self.demo_direction = 1 # 1 for Right, -1 for Left
+
         # Darkness layer for Data Center (REQ-VISUAL-09)
         self.darkness_surface = pygame.Surface((game.screen.get_width(), game.screen.get_height()), pygame.SRCALPHA)
         self.darkness_surface.fill((0, 0, 0, 200)) # Semi-transparent black
 
+    def enter_demo_mode(self):
+        self.demo_mode = True
+        self.demo_timer = 0
+        self.player.rect.topleft = (100, 100) # Reset position
+
     def handle_events(self, events):
+        if self.demo_mode:
+            # Any input exits demo mode
+            if events:
+                self.demo_mode = False
+                self.game.scene_manager.set_scene("menu_scene")
+                return
+
+        # Pass events to pause menu first
+        if self.pause_menu.visible:
+            if self.pause_menu.handle_events(events):
+                return
+
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    print("Returning to menu...")
-                    self.game.scene_manager.set_scene("menu_scene") # Placeholder for actual scene transition
+                    self.pause_menu.toggle()
 
     def update(self, dt):
-        self.all_sprites.update(dt)
+        if self.pause_menu.visible:
+            return # Pause update loop
+
+        if self.demo_mode:
+            self.update_demo(dt)
+        else:
+            self.all_sprites.update(dt)
+
+    def update_demo(self, dt):
+        self.demo_timer += dt
+
+        # Simple AI: Walk right for 2s, left for 2s
+        # Player speed is usually set in Player class (200), we just need direction vector.
+        # But we want to override the input.
+
+        velocity = pygame.math.Vector2(0, 0)
+
+        if self.demo_timer % 4 < 2:
+            velocity.x = 1
+        else:
+            velocity.x = -1
+
+        self.player.update(dt, velocity_override=velocity)
 
     def draw(self, screen):
         screen.fill(WARM_BEIGE) # Use WARM_BEIGE as default bg
@@ -76,5 +123,8 @@ class GameScene(BaseScene):
 
         # Draw HUD
         self.hud.draw(screen)
+
+        # Draw Pause Menu
+        self.pause_menu.draw(screen)
 
         # Removed debug text

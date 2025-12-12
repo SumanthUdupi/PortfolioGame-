@@ -41,24 +41,28 @@ class Player(Entity):
                     self.image = pygame.transform.scale(current_frame, (self.width, self.height))
 
 
-    def update(self, dt):
-        self.velocity.x = 0
-        self.velocity.y = 0
+    def update(self, dt, velocity_override=None):
+        if velocity_override:
+            self.velocity = pygame.math.Vector2(velocity_override)
+        else:
+            self.velocity.x = 0
+            self.velocity.y = 0
 
-        if self.input_manager.is_key_held(pygame.K_LEFT) or self.input_manager.is_key_held(pygame.K_a):
-            self.velocity.x = -1
-        if self.input_manager.is_key_held(pygame.K_RIGHT) or self.input_manager.is_key_held(pygame.K_d):
-            self.velocity.x = 1
-        if self.input_manager.is_key_held(pygame.K_UP) or self.input_manager.is_key_held(pygame.K_w):
-            self.velocity.y = -1
-        if self.input_manager.is_key_held(pygame.K_DOWN) or self.input_manager.is_key_held(pygame.K_s):
-            self.velocity.y = 1
+            if self.input_manager.is_key_held(pygame.K_LEFT) or self.input_manager.is_key_held(pygame.K_a):
+                self.velocity.x = -1
+            if self.input_manager.is_key_held(pygame.K_RIGHT) or self.input_manager.is_key_held(pygame.K_d):
+                self.velocity.x = 1
+            if self.input_manager.is_key_held(pygame.K_UP) or self.input_manager.is_key_held(pygame.K_w):
+                self.velocity.y = -1
+            if self.input_manager.is_key_held(pygame.K_DOWN) or self.input_manager.is_key_held(pygame.K_s):
+                self.velocity.y = 1
 
-        # Normalize diagonal movement
+            # Normalize diagonal movement
+            if self.velocity.length() > 0:
+                self.velocity.normalize_ip()
+
+        # Update animation based on direction
         if self.velocity.length() > 0:
-            self.velocity.normalize_ip()
-
-            # Update animation based on direction
             if self.animation:
                 if self.velocity.y > 0:
                     self.animation.set_animation("down")
