@@ -17,6 +17,13 @@ class BaseZone(BaseScene):
         # Load zone-specific data
         self.load_zone_data()
 
+        # Audio & Atmosphere: Start zone music and ambient
+        # REQ-AUDIO-01: Zone-Specific Soundtracks
+        # REQ-AUDIO-05: Ambient Layers
+        if hasattr(self.game_manager, 'audio_manager'):
+            self.game_manager.audio_manager.play_music(self.zone_id)
+            self.game_manager.audio_manager.start_ambient(self.zone_id)
+
     def on_exit(self):
         # Clear entities to prevent memory leaks
         self.entities.clear()
@@ -24,6 +31,11 @@ class BaseZone(BaseScene):
     def show_message(self, message, duration=3.0):
         self.current_message = message
         self.message_timer = duration
+        # Typewriter effect state
+        self.displayed_text = ""
+        self.typewriter_timer = 0
+        self.typewriter_speed = 0.05
+        self.text_index = 0
 
     def check_completion(self):
         # Override in subclasses
@@ -59,11 +71,25 @@ class BaseZone(BaseScene):
             self.camera_x = max(0, min(self.camera_x, WORLD_WIDTH - SCREEN_WIDTH))
             self.camera_y = max(0, min(self.camera_y, WORLD_HEIGHT - SCREEN_HEIGHT))
 
-        # Update message timer
+        # Update message timer and typewriter effect
         if self.message_timer > 0:
             self.message_timer -= dt
             if self.message_timer <= 0:
                 self.current_message = None
+                self.displayed_text = ""
+
+            # Typewriter update
+            if self.current_message and self.text_index < len(self.current_message):
+                self.typewriter_timer += dt
+                if self.typewriter_timer >= self.typewriter_speed:
+                    self.typewriter_timer = 0
+                    self.text_index += 1
+                    self.displayed_text = self.current_message[:self.text_index]
+                    # Play typing sound
+                    if hasattr(self.game_manager, 'audio_manager'):
+                        self.game_manager.audio_manager.play_typing_sound()
+            elif self.current_message:
+                self.displayed_text = self.current_message
 
     def render(self, screen):
         # Clear screen with zone-specific color
@@ -98,7 +124,9 @@ class BaseZone(BaseScene):
         # Interaction message
         if self.current_message:
             msg_font = self.game_manager.asset_manager.load_font("default.ttf", 20)
-            msg_text = msg_font.render(self.current_message, True, YELLOW)
+            # Use displayed_text instead of current_message for typewriter effect
+            text_to_render = getattr(self, 'displayed_text', self.current_message)
+            msg_text = msg_font.render(text_to_render, True, YELLOW)
             msg_x = SCREEN_WIDTH // 2 - msg_text.get_width() // 2
             msg_y = SCREEN_HEIGHT - 50
             screen.blit(msg_text, (msg_x, msg_y))

@@ -89,6 +89,30 @@ class Zone2(BaseZone):
     def get_zone_color(self):
         return (10, 10, 20)  # Dark purple for data zone
 
+    def update(self, dt):
+        super().update(dt)
+        # REQ-AUDIO-03: Spatial Audio (Simple)
+        # Update spatial audio for terminals (simulating server fans)
+        if hasattr(self.game_manager, 'audio_manager') and self.player:
+            player_pos = (self.player.x, self.player.y)
+            # Use the first terminal as the main server fan noise source
+            if self.sql_terminals:
+                server = self.sql_terminals[0]
+                # Calculate volume based on distance
+                max_dist = 400
+                dx = server.x - player_pos[0]
+                dy = server.y - player_pos[1]
+                dist = (dx*dx + dy*dy)**0.5
+
+                if dist <= max_dist:
+                    volume = 1.0 - (dist / max_dist)
+                    volume = max(0.1, min(1.0, volume))
+                else:
+                    volume = 0.1 # Minimum volume when far away
+
+                # Update ambient volume (assuming ambient track in this zone is the server hum)
+                self.game_manager.audio_manager.set_ambient_volume(volume)
+
     def render_ui(self, screen):
         super().render_ui(screen)
         font = self.game_manager.asset_manager.load_font("default.ttf", 20)
