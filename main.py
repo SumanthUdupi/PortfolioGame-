@@ -7,6 +7,7 @@ from game.managers.scene_manager import SceneManager
 from game.scenes.menu_scene import MenuScene
 from game.scenes.game_scene import GameScene
 from game.scenes.resume_scene import ResumeScene
+from game.scenes.about_scene import AboutScene
 from game.utils.event_bus import EventBus
 from game.utils.logger import setup_logging
 
@@ -28,6 +29,7 @@ class Game:
         self.scene_manager.add_scene("menu_scene", MenuScene(self))
         self.scene_manager.add_scene("game_scene", GameScene(self))
         self.scene_manager.add_scene("resume_scene", ResumeScene(self))
+        self.scene_manager.add_scene("about_scene", AboutScene(self))
         self.scene_manager.set_scene("menu_scene")
 
     def handle_events(self):

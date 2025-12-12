@@ -1,5 +1,7 @@
 import pygame
+import webbrowser
 from game.scenes.base_scene import BaseScene
+from game.managers.asset_manager import AssetManager
 from config import WHITE, BLACK, CAPTION, PRIMARY_BLUE, WARM_BEIGE, SCREEN_WIDTH, SCREEN_HEIGHT
 
 class MenuScene(BaseScene):
@@ -8,7 +10,7 @@ class MenuScene(BaseScene):
         self.font = pygame.font.Font(None, 74)
         self.option_font = pygame.font.Font(None, 50)
 
-        self.options = ["Start Career", "View Resume", "Exit"]
+        self.options = ["Start Career", "View Resume", "Credits / About Dev", "Exit"]
         self.selected_index = 0
 
         self.title_text = self.font.render(CAPTION, True, PRIMARY_BLUE)
@@ -17,8 +19,26 @@ class MenuScene(BaseScene):
         self.animation_timer = 0
         self.cursor_visible = True
 
+        # Demo Mode
+        self.idle_timer = 0
+        self.DEMO_TIMEOUT = 60 # Seconds
+
+        # GitHub Icon
+        self.github_rect = pygame.Rect(SCREEN_WIDTH - 60, SCREEN_HEIGHT - 60, 40, 40)
+        self.asset_manager = AssetManager()
+        self.resume_data = self.asset_manager.get_json('resume.json')
+
     def handle_events(self, events):
+        # Reset idle timer on any event
+        if events:
+            self.idle_timer = 0
+
         for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if self.github_rect.collidepoint(event.pos):
+                        self.open_github()
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     self.selected_index = (self.selected_index - 1) % len(self.options)
@@ -33,6 +53,15 @@ class MenuScene(BaseScene):
                         self.game.audio_manager.play_ui_sound('click')
                     self.select_option()
 
+    def open_github(self):
+        if self.resume_data and 'contact_info' in self.resume_data:
+            github_url = self.resume_data['contact_info'].get('github', '')
+            if github_url:
+                if not github_url.startswith('http'):
+                    github_url = 'https://' + github_url
+                webbrowser.open(github_url)
+                print(f"Opening GitHub: {github_url}")
+
     def select_option(self):
         option = self.options[self.selected_index]
         if option == "Start Career":
@@ -40,6 +69,8 @@ class MenuScene(BaseScene):
             self.game.scene_manager.set_scene("game_scene")
         elif option == "View Resume":
             self.game.scene_manager.set_scene("resume_scene")
+        elif option == "Credits / About Dev":
+            self.game.scene_manager.set_scene("about_scene")
         elif option == "Exit":
             self.game.running = False
 
@@ -48,6 +79,18 @@ class MenuScene(BaseScene):
         if self.animation_timer > 0.5:
             self.cursor_visible = not self.cursor_visible
             self.animation_timer = 0
+
+        self.idle_timer += dt
+        if self.idle_timer > self.DEMO_TIMEOUT:
+            self.start_demo_mode()
+
+    def start_demo_mode(self):
+        print("Starting Demo Mode...")
+        self.idle_timer = 0
+        if "game_scene" in self.game.scene_manager.scenes:
+            game_scene = self.game.scene_manager.scenes["game_scene"]
+            game_scene.enter_demo_mode()
+            self.game.scene_manager.set_scene("game_scene")
 
     def draw_desk_scene(self, screen):
         # Background
@@ -100,3 +143,11 @@ class MenuScene(BaseScene):
                     (cursor_rect.left, cursor_rect.bottom),
                     (cursor_rect.right, cursor_rect.centery)
                 ])
+
+        # Draw GitHub Icon (Simple square with 'GH' for now, or use an asset if available)
+        # Assuming no icon asset, drawing a placeholder
+        pygame.draw.rect(screen, BLACK, self.github_rect, border_radius=5)
+        gh_font = pygame.font.Font(None, 24)
+        gh_text = gh_font.render("GH", True, WHITE)
+        text_rect = gh_text.get_rect(center=self.github_rect.center)
+        screen.blit(gh_text, text_rect)

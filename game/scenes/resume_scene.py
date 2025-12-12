@@ -17,6 +17,11 @@ class ResumeScene(BaseScene):
         self.surface = None
         self.padding = 40
 
+        # Tooltip state
+        self.skill_rects = []
+        self.tooltip_text = None
+        self.tooltip_pos = (0, 0)
+
         if self.resume_data:
             self.render_resume_surface()
 
@@ -25,9 +30,10 @@ class ResumeScene(BaseScene):
         # For now, let's render to a large surface and then crop/blit
 
         lines = []
+        self.skill_rects = []
 
-        def add_line(text, font, color=BLACK, spacing=5):
-            lines.append({"text": text, "font": font, "color": color, "spacing": spacing})
+        def add_line(text, font, color=BLACK, spacing=5, is_skill=False):
+            lines.append({"text": text, "font": font, "color": color, "spacing": spacing, "is_skill": is_skill})
 
         # Process data
         info = self.resume_data.get('contact_info', {})
@@ -38,7 +44,6 @@ class ResumeScene(BaseScene):
         add_line("Professional Summary", self.font_header, PRIMARY_BLUE, 5)
         summary = self.resume_data.get('professional_summary', '')
         # Simple word wrap would be good here, but for now just add it
-        # Assuming simple wrapping is needed.
         self.wrap_text(summary, self.font_text, lines, SCREEN_WIDTH - 2 * self.padding)
         add_line("", self.font_text, BLACK, 10)
 
@@ -46,7 +51,7 @@ class ResumeScene(BaseScene):
         skills = self.resume_data.get('skills', {})
         for category, items in skills.items():
             cat_text = category.replace('_', ' ').title() + ": " + ", ".join(items)
-            self.wrap_text(cat_text, self.font_text, lines, SCREEN_WIDTH - 2 * self.padding)
+            self.wrap_text(cat_text, self.font_text, lines, SCREEN_WIDTH - 2 * self.padding, is_skill=True)
         add_line("", self.font_text, BLACK, 10)
 
         add_line("Professional Experience", self.font_header, PRIMARY_BLUE, 5)
@@ -79,10 +84,15 @@ class ResumeScene(BaseScene):
         y = self.padding
         for line in lines:
             rendered = line['font'].render(line['text'], True, line['color'])
-            self.surface.blit(rendered, (self.padding, y))
+            rect = rendered.get_rect(topleft=(self.padding, y))
+            self.surface.blit(rendered, rect)
+
+            if line.get('is_skill'):
+                self.skill_rects.append(rect)
+
             y += line['font'].get_height() + line['spacing']
 
-    def wrap_text(self, text, font, lines_list, max_width):
+    def wrap_text(self, text, font, lines_list, max_width, is_skill=False):
         words = text.split(' ')
         current_line = []
 
@@ -92,20 +102,27 @@ class ResumeScene(BaseScene):
             if w <= max_width:
                 current_line.append(word)
             else:
-                lines_list.append({"text": ' '.join(current_line), "font": font, "color": BLACK, "spacing": 2})
+                lines_list.append({"text": ' '.join(current_line), "font": font, "color": BLACK, "spacing": 2, "is_skill": is_skill})
                 current_line = [word]
         if current_line:
-            lines_list.append({"text": ' '.join(current_line), "font": font, "color": BLACK, "spacing": 2})
+            lines_list.append({"text": ' '.join(current_line), "font": font, "color": BLACK, "spacing": 2, "is_skill": is_skill})
 
     def handle_events(self, events):
+        # Mouse hover detection for tooltip
+        mouse_pos = pygame.mouse.get_pos()
+        # Adjust mouse_pos by scroll_y to match surface coordinates
+        surface_mouse_y = mouse_pos[1] + self.scroll_y
+
+        self.tooltip_text = None
+        for rect in self.skill_rects:
+            if rect.collidepoint(mouse_pos[0], surface_mouse_y):
+                self.tooltip_text = "Verified by: Project PortfolioGame"
+                self.tooltip_pos = (mouse_pos[0] + 10, mouse_pos[1] + 10)
+                break
+
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE or event.key == pygame.K_i:
-                    # Return to previous scene or main menu?
-                    # Since we don't have a stack yet, let's assume if we came from Menu, go to Menu.
-                    # Or just go to Menu for now.
-                    # Ideally the scene manager should handle 'pop'.
-                    # For now, I'll switch to 'menu_scene'.
                     self.game.scene_manager.set_scene("menu_scene")
             elif event.type == pygame.MOUSEWHEEL:
                 self.scroll_y -= event.y * 20
@@ -130,3 +147,15 @@ class ResumeScene(BaseScene):
                 bar_height = max(20, (SCREEN_HEIGHT / self.content_height) * SCREEN_HEIGHT)
                 bar_y = scroll_ratio * (SCREEN_HEIGHT - bar_height)
                 pygame.draw.rect(screen, PRIMARY_BLUE, (SCREEN_WIDTH - 10, bar_y, 8, bar_height))
+
+        # Draw tooltip
+        if self.tooltip_text:
+            tooltip_surf = self.font_text.render(self.tooltip_text, True, WHITE, (50, 50, 50))
+            # Ensure tooltip stays on screen
+            tooltip_rect = tooltip_surf.get_rect(topleft=self.tooltip_pos)
+            if tooltip_rect.right > SCREEN_WIDTH:
+                tooltip_rect.right = SCREEN_WIDTH - 5
+            if tooltip_rect.bottom > SCREEN_HEIGHT:
+                tooltip_rect.bottom = SCREEN_HEIGHT - 5
+
+            screen.blit(tooltip_surf, tooltip_rect)
