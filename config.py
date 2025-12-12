@@ -11,6 +11,14 @@ CAPTION = "PortfolioGame"
 FPS = 60
 
 # Colors (RGB)
+# Professional Tech Palette
+PRIMARY_BLUE = (17, 141, 255)  # #118DFF
+WARM_BEIGE = (230, 213, 184)   # #E6D5B8
+SUCCESS_GREEN = (0, 255, 0)    # Placeholder, need to verify strict requirement if given.
+                               # REQ-VISUAL-06 mentions "success-green color from the style guide" but guide isn't fully visible here.
+                               # Assuming standard green or I'll pick a nice one.
+                               # Let's keep existing colors but rename/add the new ones.
+
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
