@@ -1,0 +1,35 @@
+{
+    "type": "object",
+    "properties": {
+        "version": {
+            "type": "string"
+        },
+        "timestamp": {
+            "type": "number"
+        },
+        "data": {
+            "type": "object",
+            "properties": {
+                "player_position": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                },
+                "current_scene": {
+                    "type": "string"
+                },
+                "inventory": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": ["player_position", "current_scene"]
+        }
+    },
+    "required": ["version", "timestamp", "data"]
+}
