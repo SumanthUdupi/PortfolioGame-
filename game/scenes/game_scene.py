@@ -3,6 +3,7 @@ from game.scenes.base_scene import BaseScene
 from config import BLACK, WHITE, WARM_BEIGE
 from game.managers.tilemap_manager import TileMapManager
 from game.entities.player import Player
+from game.ui.hud import HUD
 
 class GameScene(BaseScene):
     def __init__(self, game):
@@ -17,6 +18,10 @@ class GameScene(BaseScene):
         self.player = Player(100, 100, 32, 32, asset_key="player.png") # Assuming player.png exists or will fail gracefully
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.player)
+
+        # HUD
+        self.hud = HUD(game)
+        # TODO: Link player to HUD explicitly if needed, or HUD can access via game.scene_manager
 
         # Darkness layer for Data Center (REQ-VISUAL-09)
         self.darkness_surface = pygame.Surface((game.screen.get_width(), game.screen.get_height()), pygame.SRCALPHA)
@@ -69,5 +74,7 @@ class GameScene(BaseScene):
 
         screen.blit(self.darkness_surface, (0,0))
 
-        game_text_rect = self.game_text.get_rect(center=(self.game.screen.get_width() / 2, self.game.screen.get_height() / 2))
-        screen.blit(self.game_text, game_text_rect)
+        # Draw HUD
+        self.hud.draw(screen)
+
+        # Removed debug text

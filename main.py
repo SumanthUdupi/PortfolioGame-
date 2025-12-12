@@ -4,6 +4,7 @@ from config import SCREEN_WIDTH, SCREEN_HEIGHT, CAPTION, FPS
 from game.managers.scene_manager import SceneManager
 from game.scenes.menu_scene import MenuScene
 from game.scenes.game_scene import GameScene
+from game.scenes.resume_scene import ResumeScene
 
 class Game:
     def __init__(self):
@@ -16,6 +17,7 @@ class Game:
         self.scene_manager = SceneManager()
         self.scene_manager.add_scene("menu_scene", MenuScene(self))
         self.scene_manager.add_scene("game_scene", GameScene(self))
+        self.scene_manager.add_scene("resume_scene", ResumeScene(self))
         self.scene_manager.set_scene("menu_scene")
 
     def handle_events(self):

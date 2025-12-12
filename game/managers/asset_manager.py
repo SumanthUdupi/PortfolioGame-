@@ -1,5 +1,6 @@
 import pygame
 import os
+import json
 
 class AssetManager:
     _instance = None
@@ -10,8 +11,25 @@ class AssetManager:
             cls._instance.images = {}
             cls._instance.fonts = {}
             cls._instance.sounds = {}
+            cls._instance.json_data = {}
             cls._instance.base_path = os.path.join(os.path.dirname(__file__), '..', '..', 'assets')
         return cls._instance
+
+    def load_json(self, path):
+        full_path = os.path.join(self.base_path, 'data', path)
+        if full_path not in self.json_data:
+            try:
+                with open(full_path, 'r') as f:
+                    data = json.load(f)
+                self.json_data[full_path] = data
+            except (FileNotFoundError, json.JSONDecodeError) as e:
+                print(f"Error loading JSON {full_path}: {e}")
+                return None
+        return self.json_data[full_path]
+
+    def get_json(self, path):
+        full_path = os.path.join(self.base_path, 'data', path)
+        return self.json_data.get(full_path) or self.load_json(path)
 
     def load_image(self, path, colorkey=None):
         full_path = os.path.join(self.base_path, 'sprites', path)
@@ -69,3 +87,4 @@ class AssetManager:
         self.images = {}
         self.fonts = {}
         self.sounds = {}
+        self.json_data = {}
