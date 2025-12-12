@@ -78,6 +78,10 @@ class GherkinMinigame:
                 for block in self.blocks:
                     if block.is_dragging:
                         block.is_dragging = False
+                        # Play snap sound (typing sound as placeholder for mechanical feel)
+                        if hasattr(self.game_manager, 'audio_manager'):
+                            self.game_manager.audio_manager.play_typing_sound()
+
                         self.snap_to_slot(block)
                         self.check_completion()
 

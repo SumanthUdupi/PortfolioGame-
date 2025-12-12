@@ -22,9 +22,15 @@ class MenuScene(BaseScene):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     self.selected_index = (self.selected_index - 1) % len(self.options)
+                    if hasattr(self.game, 'audio_manager'):
+                        self.game.audio_manager.play_ui_sound('hover')
                 elif event.key == pygame.K_DOWN:
                     self.selected_index = (self.selected_index + 1) % len(self.options)
+                    if hasattr(self.game, 'audio_manager'):
+                        self.game.audio_manager.play_ui_sound('hover')
                 elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+                    if hasattr(self.game, 'audio_manager'):
+                        self.game.audio_manager.play_ui_sound('click')
                     self.select_option()
 
     def select_option(self):
